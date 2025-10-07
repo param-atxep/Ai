@@ -1,22 +1,36 @@
-import React, {useState} from 'react'
+import { useState } from 'react';
+import api from '../../utils/api';
 
 
-export default function Signup(){
-const [name,setName]=useState('')
-const [email,setEmail]=useState('')
-const [password,setPassword]=useState('')
-const handle = (e)=>{ e.preventDefault(); alert('Demo signup') }
+export default function Signup() {
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [error, setError] = useState('');
+
+
+const handleSignup = async (e) => {
+e.preventDefault();
+try {
+const res = await api.post('/auth/signup', { name, email, password });
+localStorage.setItem('token', res.data.token);
+alert('Signup successful');
+} catch (err) {
+setError(err.response?.data?.error || 'Signup failed');
+}
+};
+
+
 return (
-<div className="container-max">
-<div className="max-w-md mx-auto">
-<h2 className="text-2xl font-bold mb-4">Sign up</h2>
-<form onSubmit={handle} className="space-y-4">
-<input value={name} onChange={e=>setName(e.target.value)} placeholder="Full name" className="w-full p-2 border rounded" />
-<input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full p-2 border rounded" />
-<input value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" className="w-full p-2 border rounded" />
-<button className="w-full py-2 rounded bg-green-600 text-white">Create account</button>
+<div>
+<h2>Signup</h2>
+<form onSubmit={handleSignup}>
+<input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
+<input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+<input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+<button type="submit">Signup</button>
 </form>
+{error && <p style={{ color: 'red' }}>{error}</p>}
 </div>
-</div>
-)
+);
 }
