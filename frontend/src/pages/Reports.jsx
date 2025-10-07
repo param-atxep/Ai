@@ -1,32 +1,44 @@
-import React from 'react'
-import Card from '../components/Card'
+import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
 
-export default function Reports(){
-const reports = [
-{id:'r1', company:'Acme Corp', date:'2025-09-01', score:65},
-{id:'r2', company:'Beta Ltd', date:'2024-07-12', score:45},
-]
+export default function Reports() {
+const [reports, setReports] = useState([]);
+
+
+useEffect(() => {
+const fetchReports = async () => {
+try {
+const res = await api.get('/results/all');
+setReports(res.data);
+} catch (err) {
+console.error(err);
+}
+};
+fetchReports();
+}, []);
 
 
 return (
-<div className="container-max">
-<h2 className="text-xl font-bold mb-4">Reports & History</h2>
-
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-{reports.map(r=> (
-<Card key={r.id}>
-<div className="flex justify-between items-center">
 <div>
-<div className="font-semibold">{r.company}</div>
-<div className="text-sm">{r.date}</div>
+<h2>Past Reports</h2>
+{reports.length === 0 ? (
+<p>No reports yet.</p>
+) : (
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+{reports.map((r) => (
+<div key={r._id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
+<p><strong>Source:</strong> {r.source}</p>
+<p><strong>Score:</strong> {r.score}</p>
+<p><strong>Sentiment:</strong> {r.sentiment}</p>
+<p><strong>Claims:</strong></p>
+<ul>
+{r.claims.map((c, i) => <li key={i}>{c.text} (Confidence: {c.confidence})</li>)}
+</ul>
 </div>
-<div className="text-lg font-bold">{r.score}</div>
-</div>
-</Card>
 ))}
 </div>
+)}
 </div>
-)
+);
 }
